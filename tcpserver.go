@@ -10,17 +10,17 @@ import (
 )
 
 type tcpserver struct {
-	sim *simulacra
+	dng *danger
 }
 
-func newTcpServer(sim *simulacra) *tcpserver {
-	return &tcpserver{sim: sim}
+func newTcpServer(dng *danger) *tcpserver {
+	return &tcpserver{dng: dng}
 }
 
 func (s *tcpserver) up() {
 
 	// Listen for incoming connections.
-	l, err := net.Listen("tcp", "localhost: "+s.sim.tcpPort)
+	l, err := net.Listen("tcp", "localhost: "+s.dng.tcpPort)
 	if err != nil {
 		fmt.Println("Error listening:", err.Error())
 		os.Exit(1)
@@ -29,7 +29,7 @@ func (s *tcpserver) up() {
 	// Close the listener when the application closes.
 	defer l.Close()
 
-	fmt.Println("TCP server listening on port: " + s.sim.tcpPort)
+	fmt.Println("TCP server listening on port: " + s.dng.tcpPort)
 
 	for {
 		// Listen for an incoming connection.
@@ -57,8 +57,8 @@ func (s *tcpserver) handleRequest(conn net.Conn) {
 			break
 		}
 
-		s.sim.Cmd <- p
-		resp := <-s.sim.Res
+		s.dng.Cmd <- p
+		resp := <-s.dng.Res
 
 		_, err = conn.Write(resp.ToBytePack())
 		if err != nil {

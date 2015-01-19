@@ -7,23 +7,23 @@ import (
 )
 
 type httpserver struct {
-	sim *simulacra
+	dng *danger
 }
 
-func newHttpServer(sim *simulacra) *httpserver {
-	return &httpserver{sim: sim}
+func newHttpServer(dng *danger) *httpserver {
+	return &httpserver{dng: dng}
 }
 
 func (s *httpserver) mainHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
-	fmt.Fprintf(w, s.sim.getStatus())
+	fmt.Fprintf(w, s.dng.getStatus())
 }
 
 func (s *httpserver) pingHandler(w http.ResponseWriter, r *http.Request) {
-	if s.sim.ping == 200 {
+	if s.dng.ping == 200 {
 		fmt.Fprintf(w, "pong")
 	} else {
-		w.WriteHeader(s.sim.ping)
+		w.WriteHeader(s.dng.ping)
 		fmt.Fprintf(w, "")
 	}
 }
@@ -33,9 +33,9 @@ func (s *httpserver) up() {
 	http.HandleFunc("/", s.mainHandler)
 	http.HandleFunc("/ping", s.pingHandler)
 
-	fmt.Println("HTTP servxxer listening on port: " + s.sim.httpPort)
+	fmt.Println("HTTP servxxer listening on port: " + s.dng.httpPort)
 
-	err := http.ListenAndServe(":"+s.sim.httpPort, nil)
+	err := http.ListenAndServe(":"+s.dng.httpPort, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err.Error())
 	}

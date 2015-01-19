@@ -32,6 +32,6 @@ func newPing(p packet.Packet) (Action, error) {
 	return m, nil
 }
 
-func (m Ping) act(s *simulacra) {
-	s.ping = m.Code
+func (m Ping) act(dng *danger) {
+	dng.ping = m.Code
 }

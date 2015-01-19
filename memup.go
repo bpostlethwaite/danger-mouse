@@ -35,7 +35,7 @@ func newMemUp(p packet.Packet) (Action, error) {
 	return m, nil
 }
 
-func (m MemUp) act(s *simulacra) {
+func (m MemUp) act(dng *danger) {
 
 	megs := float64(m.Megs)
 
@@ -64,7 +64,7 @@ func (m MemUp) act(s *simulacra) {
 			junk[i] = uint8(rand.Intn(255))
 		}
 
-		s.memdb = append(s.memdb, junk)
+		dng.memdb = append(dng.memdb, junk)
 
 		fmt.Println("memory now at", getheap(), "megabytes")
 

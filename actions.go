@@ -7,7 +7,7 @@ import (
 )
 
 type Action interface {
-	act(s *simulacra)
+	act(dng *danger)
 }
 
 func PacketToAction(p packet.Packet) (Action, error) {
@@ -23,6 +23,9 @@ func PacketToAction(p packet.Packet) (Action, error) {
 		act, err = newPing(p)
 	case "cpu":
 		act, err = newCpu(p)
+	// case "dbsize":
+	// 	act, err = newCpu(p)
+
 	default:
 		err = fmt.Errorf("Unrecognized command")
 	}

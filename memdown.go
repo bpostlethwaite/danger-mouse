@@ -20,8 +20,8 @@ func newMemDown(p packet.Packet) (Action, error) {
 	return m, nil
 }
 
-func (m MemDown) act(s *simulacra) {
-	s.memdb = make([][]byte, 0)
+func (m MemDown) act(dng *danger) {
+	dng.memdb = make([][]byte, 0)
 
 	// force a garbage collection and attempts to return memory back to OS
 	debug.FreeOSMemory()

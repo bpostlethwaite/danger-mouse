@@ -41,7 +41,7 @@ func fact(n int) int {
 	return n * fact(n-1)
 }
 
-func (c Cpu) act(s *simulacra) {
+func (c Cpu) act(dng *danger) {
 
 	ncpus := runtime.GOMAXPROCS(-1)
 	ngos := 4 * ncpus
