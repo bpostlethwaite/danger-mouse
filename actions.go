@@ -21,6 +21,8 @@ func PacketToAction(p packet.Packet) (Action, error) {
 		act, err = newMemDown(p)
 	case "ping":
 		act, err = newPing(p)
+	case "cpu":
+		act, err = newCpu(p)
 	default:
 		err = fmt.Errorf("Unrecognized command")
 	}
