@@ -19,7 +19,7 @@ type simulacra struct {
 	httpPort string
 	tcpPort  string
 	active   *Action
-	ping     bool
+	ping     int
 	memdb    [][]byte
 }
 
@@ -35,6 +35,7 @@ func NewSimulacra(conf SimulacraConfig) *simulacra {
 		tcpPort:  tcpPort,
 		httpPort: httpPort,
 		active:   nil,
+		ping:     200,
 		memdb:    make([][]byte, 0),
 	}
 }
@@ -85,5 +86,6 @@ func (s *simulacra) getStatus() string {
 	if s.active == nil {
 		return "simulacra is idle"
 	}
-	return fmt.Sprintf("simulacra is running command", *s.active)
+	cmd := reflect.TypeOf(*s.active).Name()
+	return fmt.Sprintf("simulacra is running command %s with %+v\n", cmd, *s.active)
 }

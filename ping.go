@@ -1,0 +1,37 @@
+package main
+
+import (
+	"fmt"
+	"strconv"
+
+	"./packet"
+)
+
+type Ping struct {
+	Code int
+}
+
+func newPing(p packet.Packet) (Action, error) {
+	m := Ping{}
+
+	if p.Cmd != "ping" {
+		return m, fmt.Errorf("wrong command for type MemUp")
+	}
+
+	i, err := strconv.Atoi(p.Arg)
+	if err != nil {
+		return m, err
+	}
+
+	if i < 1 || i > 999 {
+		return m, fmt.Errorf("ping status code argument must be within range (0, 1000)")
+	}
+
+	m.Code = i
+
+	return m, nil
+}
+
+func (m Ping) act(s *simulacra) {
+	s.ping = m.Code
+}
