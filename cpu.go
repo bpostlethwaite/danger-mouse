@@ -5,15 +5,13 @@ import (
 	"runtime"
 	"strconv"
 	"time"
-
-	"./packet"
 )
 
 type Cpu struct {
 	Seconds time.Duration // how long to burn CPU
 }
 
-func newCpu(p packet.Packet) (Action, error) {
+func newCpu(p Packet) (Action, error) {
 	c := Cpu{}
 
 	if p.Cmd != "cpu" {
@@ -41,7 +39,7 @@ func fact(n int) int {
 	return n * fact(n-1)
 }
 
-func (c Cpu) act(dng *danger) {
+func (c Cpu) act(dng *danger) error {
 
 	ncpus := runtime.GOMAXPROCS(-1)
 	ngos := 4 * ncpus
@@ -69,4 +67,5 @@ func (c Cpu) act(dng *danger) {
 	}
 
 	time.Sleep(c.Seconds)
+	return nil
 }

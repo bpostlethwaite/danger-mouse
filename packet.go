@@ -1,4 +1,4 @@
-package packet
+package main
 
 import "encoding/json"
 
@@ -15,10 +15,10 @@ func (p Packet) ToBytePack() []byte {
 	return append(bytepck, []byte("\n")[0])
 }
 
-func FromBytes(b []byte) (p Packet, err error) {
-	p = Packet{}
-	err = json.Unmarshal(b, &p)
-	return
+func FromBytes(b []byte) (Packet, error) {
+	p := Packet{}
+	err := json.Unmarshal(b, &p)
+	return p, err
 }
 
 func ErrorPacket(s string) Packet {

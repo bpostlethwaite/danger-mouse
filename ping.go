@@ -3,15 +3,13 @@ package main
 import (
 	"fmt"
 	"strconv"
-
-	"./packet"
 )
 
 type Ping struct {
 	Code int
 }
 
-func newPing(p packet.Packet) (Action, error) {
+func newPing(p Packet) (Action, error) {
 	m := Ping{}
 
 	if p.Cmd != "ping" {
@@ -32,6 +30,7 @@ func newPing(p packet.Packet) (Action, error) {
 	return m, nil
 }
 
-func (m Ping) act(dng *danger) {
+func (m Ping) act(dng *danger) error {
 	dng.ping = m.Code
+	return nil
 }

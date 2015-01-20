@@ -2,15 +2,12 @@ package main
 
 import (
 	"fmt"
-	"runtime/debug"
-
-	"./packet"
 )
 
 type MemDown struct {
 }
 
-func newMemDown(p packet.Packet) (Action, error) {
+func newMemDown(p Packet) (Action, error) {
 	m := MemDown{}
 
 	if p.Cmd != "memdown" {
@@ -20,9 +17,7 @@ func newMemDown(p packet.Packet) (Action, error) {
 	return m, nil
 }
 
-func (m MemDown) act(dng *danger) {
-	dng.memdb = make([][]byte, 0)
-
-	// force a garbage collection and attempts to return memory back to OS
-	debug.FreeOSMemory()
+func (m MemDown) act(dng *danger) error {
+	dng.memcache.create()
+	return nil
 }

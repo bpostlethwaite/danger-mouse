@@ -6,29 +6,22 @@ import (
 	"net"
 	"os"
 	"strconv"
-
-	"../packet/"
 )
-
-type SimulacraConfig struct {
-	httpPort int
-	tcpPort  int
-}
 
 type tcpclient struct {
 	port string
 }
 
-func NewTCPClient(conf SimulacraConfig) *tcpclient {
+func NewTCPClient(conf DangerConfig) *tcpclient {
 	// checking and validation
-	tcpPort := strconv.Itoa(conf.tcpPort)
+	port := strconv.Itoa(conf.TcpPort)
 
 	return &tcpclient{
-		port: tcpPort,
+		port: port,
 	}
 }
 
-func (tcp *tcpclient) Send(p packet.Packet) {
+func (tcp *tcpclient) Send(p Packet) {
 
 	servAddr := "localhost:" + tcp.port
 	tcpAddr, err := net.ResolveTCPAddr("tcp", servAddr)
@@ -55,14 +48,34 @@ func (tcp *tcpclient) Send(p packet.Packet) {
 
 	scanner := bufio.NewScanner(conn)
 	for scanner.Scan() {
-		rp, err := packet.FromBytes(scanner.Bytes())
+		rp, err := FromBytes(scanner.Bytes())
 		if err != nil {
 			fmt.Println("Error parsing client message", err.Error())
 			os.Exit(1)
 		}
-
-		println(rp.Arg)
+		if rp.Cmd == "error" {
+			println(rp.Arg)
+		}
 		break // one response at a time
+	}
+
+}
+
+func (tcp *tcpclient) Run(args []string) {
+
+	if len(args) > 0 {
+
+		p := Packet{}
+		p.Cmd = args[0]
+
+		if len(args) == 2 {
+			p.Arg = args[1]
+		}
+
+		tcp.Send(p)
+
+	} else {
+		tcp.PrintUsage("")
 	}
 
 }

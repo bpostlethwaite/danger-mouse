@@ -1,0 +1,8 @@
+{
+  "work-dir": "./",
+  "pid-file": "/var/run/danger.pid",
+  "log-file": "/var/log/danger.log",
+  "tcp-port": 3344,
+  "http-port": 8080,
+  "db-file": "danger.db"
+}

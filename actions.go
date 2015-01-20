@@ -2,15 +2,13 @@ package main
 
 import (
 	"fmt"
-
-	"./packet"
 )
 
 type Action interface {
-	act(dng *danger)
+	act(dng *danger) error
 }
 
-func PacketToAction(p packet.Packet) (Action, error) {
+func PacketToAction(p Packet) (Action, error) {
 	var act Action
 	var err error
 
@@ -23,8 +21,10 @@ func PacketToAction(p packet.Packet) (Action, error) {
 		act, err = newPing(p)
 	case "cpu":
 		act, err = newCpu(p)
-	// case "dbsize":
-	// 	act, err = newCpu(p)
+	case "dbup":
+		act, err = newDBUp(p)
+	case "dbdown":
+		act, err = newDBDown(p)
 
 	default:
 		err = fmt.Errorf("Unrecognized command")

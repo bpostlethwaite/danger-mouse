@@ -4,88 +4,101 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
-
-	"./packet"
 )
 
-type DangerConfig struct {
-	httpPort int
-	tcpPort  int
-}
-
 type danger struct {
-	Cmd      chan packet.Packet
-	Res      chan packet.Packet
+	Cmd      chan Packet
+	Res      chan Packet
+	db       *DB
 	httpPort string
 	tcpPort  string
 	active   *Action
 	ping     int
-	memdb    [][]byte
+	memcache *MemCache
 }
 
 func NewDanger(conf DangerConfig) *danger {
 
-	// checking and validation
-	tcpPort := strconv.Itoa(conf.tcpPort)
-	httpPort := strconv.Itoa(conf.httpPort)
+	// should validate port ranges
+	tcpPort := strconv.Itoa(conf.TcpPort)
+	httpPort := strconv.Itoa(conf.HttpPort)
 
-	return &danger{
-		Cmd:      make(chan packet.Packet, 0),
-		Res:      make(chan packet.Packet, 0),
+	// should to validate path here
+	dbfile := conf.DBFile
+
+	dng := &danger{
+		Cmd:      make(chan Packet, 0),
+		Res:      make(chan Packet, 0),
 		tcpPort:  tcpPort,
 		httpPort: httpPort,
 		active:   nil,
 		ping:     200,
-		memdb:    make([][]byte, 0),
 	}
+
+	dng.db = &DB{path: dbfile}
+	if err := dng.db.create(); err != nil {
+		dng.handleErr(err)
+	}
+
+	dng.memcache = &MemCache{}
+	dng.memcache.create()
+
+	return dng
 }
 
-func (s *danger) Run() {
+func (dng *danger) Run() {
 
-	tcp := newTcpServer(s)
+	tcp := newTcpServer(dng)
 	go tcp.up()
 
-	http := newHttpServer(s)
+	http := newHttpServer(dng)
 	go http.up()
 
-	for p := range s.Cmd {
-		s.Res <- s.cmdRouter(p)
+	for p := range dng.Cmd {
+		dng.Res <- dng.cmdRouter(p)
 	}
 }
 
-func (s *danger) cmdRouter(p packet.Packet) packet.Packet {
+func (dng *danger) cmdRouter(p Packet) Packet {
 
 	a, err := PacketToAction(p)
 
 	if err != nil {
-		return packet.ErrorPacket(err.Error())
+		return ErrorPacket(err.Error())
 	}
 
-	if s.active != nil {
-		return packet.ErrorPacket("danger is currently busy")
+	if dng.active != nil {
+		return ErrorPacket("danger is currently busy")
 	}
 
 	// lock danger until handler has run
-	s.active = &a
+	dng.active = &a
 
 	go func() {
 
 		// unlock danger once handler returns
 		defer func() {
-			s.active = nil
+			dng.active = nil
 		}()
 
-		a.act(s)
+		if err := a.act(dng); err != nil {
+			dng.handleErr(err)
+		}
 	}()
 
 	// return success packet
-	return packet.ResponsePacket(reflect.TypeOf(a).Name())
+	return ResponsePacket(reflect.TypeOf(a).Name())
 }
 
-func (s *danger) getStatus() string {
-	if s.active == nil {
+func (dng *danger) getStatus() string {
+	if dng.active == nil {
 		return "danger is idle"
 	}
-	cmd := reflect.TypeOf(*s.active).Name()
-	return fmt.Sprintf("danger is running command %s with %+v\n", cmd, *s.active)
+	cmd := reflect.TypeOf(*dng.active).Name()
+	return fmt.Sprintf("danger is running command %s with %+v\n", cmd, *dng.active)
+}
+
+func (dng *danger) handleErr(err error) {
+	// log the error and continue
+	panic(err.Error())
 }

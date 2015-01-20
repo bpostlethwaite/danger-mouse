@@ -18,20 +18,27 @@ var (
 		reload — reloading the configuration file`)
 )
 
+const confFile = "/etc/danger.json"
+
 func main() {
 	flag.Parse()
 	daemon.AddCommand(daemon.StringFlag(signal, "quit"), syscall.SIGQUIT, termHandler)
 	daemon.AddCommand(daemon.StringFlag(signal, "stop"), syscall.SIGTERM, termHandler)
 	daemon.AddCommand(daemon.StringFlag(signal, "reload"), syscall.SIGHUP, reloadHandler)
 
+	dconf, err := readConfig(confFile)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
 	cntxt := &daemon.Context{
-		PidFileName: "pid",
+		PidFileName: dconf.PidFile,
 		PidFilePerm: 0644,
-		LogFileName: "log",
+		LogFileName: dconf.LogFile,
 		LogFilePerm: 0640,
-		WorkDir:     "./",
+		WorkDir:     dconf.WorkDir,
 		Umask:       027,
-		Args:        []string{"[go-daemon sample]"},
 	}
 
 	if len(daemon.ActiveFlags()) > 0 {
@@ -43,9 +50,14 @@ func main() {
 		return
 	}
 
+	// IF the daemon is already running and user specified command args
+	// Spin up a tcp server and connect to Daemon and serve commands
+
 	args := flag.Args()
 	if len(args) > 0 {
-		fmt.Println(args)
+		tcp := NewTCPClient(dconf)
+
+		tcp.Run(args)
 		return
 	}
 
@@ -61,7 +73,7 @@ func main() {
 	log.Println("- - - - - - - - - - - - - - -")
 	log.Println("daemon started")
 
-	go worker()
+	go worker(dconf)
 
 	err = daemon.ServeSignals()
 	if err != nil {
@@ -73,12 +85,13 @@ func main() {
 var (
 	stop = make(chan struct{})
 	done = make(chan struct{})
-	ctcp = make(chan packet)
 )
 
-func worker() {
+func worker(conf DangerConfig) {
 
-	go spinUpTcp(ctcp)
+	dng := NewDanger(conf)
+
+	go dng.Run()
 
 	for {
 		time.Sleep(time.Second)

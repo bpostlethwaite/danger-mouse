@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
+	"os"
 )
 
 type httpserver struct {
@@ -33,10 +33,9 @@ func (s *httpserver) up() {
 	http.HandleFunc("/", s.mainHandler)
 	http.HandleFunc("/ping", s.pingHandler)
 
-	fmt.Println("HTTP servxxer listening on port: " + s.dng.httpPort)
-
 	err := http.ListenAndServe(":"+s.dng.httpPort, nil)
 	if err != nil {
-		log.Fatal("ListenAndServe: ", err.Error())
+		// log here
+		os.Exit(1)
 	}
 }

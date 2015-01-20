@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net"
 	"os"
-
-	"./packet"
 )
 
 type tcpserver struct {
@@ -17,25 +15,23 @@ func newTcpServer(dng *danger) *tcpserver {
 	return &tcpserver{dng: dng}
 }
 
-func (s *tcpserver) up() {
+func (s *tcpserver) up() error {
 
 	// Listen for incoming connections.
 	l, err := net.Listen("tcp", "localhost: "+s.dng.tcpPort)
 	if err != nil {
-		fmt.Println("Error listening:", err.Error())
+		// log here
 		os.Exit(1)
 	}
 
 	// Close the listener when the application closes.
 	defer l.Close()
 
-	fmt.Println("TCP server listening on port: " + s.dng.tcpPort)
-
 	for {
 		// Listen for an incoming connection.
 		conn, err := l.Accept()
 		if err != nil {
-			fmt.Println("Error accepting: ", err.Error())
+			// log here
 			os.Exit(1)
 		}
 
@@ -51,7 +47,7 @@ func (s *tcpserver) handleRequest(conn net.Conn) {
 	scanner := bufio.NewScanner(conn)
 	for scanner.Scan() {
 
-		p, err := packet.FromBytes(scanner.Bytes())
+		p, err := FromBytes(scanner.Bytes())
 		if err != nil {
 			fmt.Println("Error parsing client message", err.Error())
 			break
@@ -62,7 +58,7 @@ func (s *tcpserver) handleRequest(conn net.Conn) {
 
 		_, err = conn.Write(resp.ToBytePack())
 		if err != nil {
-			panic(err.Error())
+			s.dng.handleErr(err)
 		}
 
 		break // we only read one command from each connection
