@@ -9,12 +9,12 @@ import (
 const bytesPerMB int64 = 1000000
 
 type DangerConfig struct {
-	HttpPort int    `json:"http-port"`
-	TcpPort  int    `json:"tcp-port"`
-	DBFile   string `json:"db-file"`
-	PidFile  string `json:"pid-file"`
-	LogFile  string `json:"log-file"`
-	WorkDir  string `json:"work-dir"`
+	HttpPort   int    `json:"http-port"`
+	TcpPort    int    `json:"tcp-port"`
+	DBFilename string `json:"db-filename"`
+	PidFile    string `json:"pid-file"`
+	LogFile    string `json:"log-file"`
+	WorkDir    string `json:"work-dir"`
 }
 
 func readConfig(confFile string) (DangerConfig, error) {

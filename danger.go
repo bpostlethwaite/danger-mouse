@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"path"
 	"reflect"
 	"strconv"
 )
@@ -23,8 +24,8 @@ func NewDanger(conf DangerConfig) *danger {
 	tcpPort := strconv.Itoa(conf.TcpPort)
 	httpPort := strconv.Itoa(conf.HttpPort)
 
-	// should to validate path here
-	dbfile := conf.DBFile
+	// we write to the working directory
+	dbfile := path.Base(conf.DBFilename)
 
 	dng := &danger{
 		Cmd:      make(chan Packet, 0),

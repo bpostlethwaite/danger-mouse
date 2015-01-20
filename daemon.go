@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/sevlyar/go-daemon"
+	"github.com/bpostlethwaite/go-daemon"
 )
 
 var (
@@ -53,19 +53,18 @@ func main() {
 	// IF the daemon is already running and user specified command args
 	// Spin up a tcp server and connect to Daemon and serve commands
 
-	args := flag.Args()
-	if len(args) > 0 {
-		tcp := NewTCPClient(dconf)
-
-		tcp.Run(args)
-		return
-	}
-
 	d, err := cntxt.Reborn()
 	if err != nil {
 		log.Fatalln(err)
 	}
 	if d != nil {
+		// we are the parent - communicate to the child
+		args := flag.Args()
+		if len(args) > 0 {
+			tcp := NewTCPClient(dconf)
+			tcp.Run(args)
+		}
+
 		return
 	}
 	defer cntxt.Release()
