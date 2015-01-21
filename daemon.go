@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"syscall"
 	"time"
 
@@ -18,7 +19,7 @@ var (
 		reload — reloading the configuration file`)
 )
 
-const confFile = "/etc/danger.json"
+const confFile = "danger.json"
 
 func main() {
 	flag.Parse()
@@ -26,18 +27,25 @@ func main() {
 	daemon.AddCommand(daemon.StringFlag(signal, "stop"), syscall.SIGTERM, termHandler)
 	daemon.AddCommand(daemon.StringFlag(signal, "reload"), syscall.SIGHUP, reloadHandler)
 
-	dconf, err := readConfig(confFile)
+	dconf, err := readConfigs(confFile, []string{"./", "/etc", "/var/lib/danger/"})
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
+	dconf = applyConfigDefaults(dconf)
+
+	if err := os.MkdirAll(dconf.WorkDir, 0755); err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
 	cntxt := &daemon.Context{
-		PidFileName: dconf.PidFile,
+		PidFileName: path.Base(dconf.PidFile),
 		PidFilePerm: 0644,
-		LogFileName: dconf.LogFile,
+		LogFileName: path.Base(dconf.LogFile),
 		LogFilePerm: 0640,
-		WorkDir:     dconf.WorkDir,
+		WorkDir:     path.Base(dconf.WorkDir),
 		Umask:       027,
 	}
 

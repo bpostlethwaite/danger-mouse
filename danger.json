@@ -1,8 +1,8 @@
 {
-  "work-dir":    "/var/log/",
-  "pid-file":    "/var/run/danger.pid",
-  "log-file":    "/var/log/danger.log",
+  "work-dir":    "/var/lib/danger",
+  "pid-file":    "danger.pid",
+  "log-file":    "danger.log",
+  "db-file":     "danger.db",
   "tcp-port":    3344,
-  "http-port":   8080,
-  "db-filename": "danger.db"
+  "http-port":   8080
 }

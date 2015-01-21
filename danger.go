@@ -25,7 +25,7 @@ func NewDanger(conf DangerConfig) *danger {
 	httpPort := strconv.Itoa(conf.HttpPort)
 
 	// we write to the working directory
-	dbfile := path.Base(conf.DBFilename)
+	dbfile := path.Base(conf.DBFile)
 
 	dng := &danger{
 		Cmd:      make(chan Packet, 0),
