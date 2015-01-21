@@ -25,7 +25,6 @@ func readConfigs(filename string, dirs []string) (DangerConfig, error) {
 		if _, err := os.Stat(confpath); os.IsNotExist(err) {
 			continue
 		} else {
-			fmt.Println("attempting to read from", confpath)
 			conf, err := readConfig(confpath)
 			return conf, err
 		}

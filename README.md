@@ -7,10 +7,11 @@ state mutating server for stress testing your monitoring setup
 go get github.com/bpostlethwaite/danger-mouse
 go install
 ```
-**danger-mouse** requires a configuration file `danger.json` in one of these directories
-1. `./`
-2. `/etc`
-3. `/var/lib/danger/`
+**danger-mouse** requires a configuration file `danger.json` in one of these directories:
+
+1.  `./`
+2.  `/etc`
+3.  `/var/lib/danger/`
 
 for the following example we will cp the default config into `/etc`
 ```shell
