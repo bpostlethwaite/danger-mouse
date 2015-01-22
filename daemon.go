@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 	"syscall"
 	"time"
 
@@ -35,17 +36,17 @@ func main() {
 
 	dconf = applyConfigDefaults(dconf)
 
-	if err := os.MkdirAll(dconf.WorkDir, 0755); err != nil {
+	if err := os.MkdirAll(dconf.WorkDir, 0777); err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
 	cntxt := &daemon.Context{
-		PidFileName: path.Base(dconf.PidFile),
+		PidFileName: filepath.Join(dconf.WorkDir, path.Base(dconf.PidFile)),
 		PidFilePerm: 0644,
-		LogFileName: path.Base(dconf.LogFile),
+		LogFileName: filepath.Join(dconf.WorkDir, path.Base(dconf.LogFile)),
 		LogFilePerm: 0640,
-		WorkDir:     path.Base(dconf.WorkDir),
+		WorkDir:     dconf.WorkDir,
 		Umask:       027,
 	}
 

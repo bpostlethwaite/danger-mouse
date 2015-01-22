@@ -13,7 +13,7 @@ go install
 2.  `/etc`
 3.  `/var/lib/danger/`
 
-for the following example we will cp the default config into `/etc`
+for the following example we will copy the default config into `/etc`
 ```shell
 cp $GOPATH/src/github.com/bpostlethwaite/danger-mouse/danger.json /etc/danger.json
 ```
@@ -84,5 +84,4 @@ Truncate the file size of the db file to 0 bytes
 danger dbdown
 ```
 
-##
-License MIT
+## License MIT
